@@ -1,0 +1,9 @@
+# Large data files
+*.sav
+*.csv
+*.xlsx
+*.zip
+
+.Rproj.user
+.RDataTmp
+BalanceBoardManualData.RData
