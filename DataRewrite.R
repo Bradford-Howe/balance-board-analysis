@@ -1,7 +1,7 @@
 library(zoo)
 library(dplyr)
 
-# Save your main object
+# Save large data file.
 setwd(LargeEnvirDir)
 
 # saveRDS(AllTrials, file = "AllTrials.rds", compress = T)
@@ -24,7 +24,12 @@ setwd(WiiReadDir)
 setwd(WiiWriteDir)
 setwd(PlotDir)
 
-#### Read data
+###############################
+#### Read original data
+#### The original data has no header. This loop pulls the data, gives it the
+#### correct header per the Wii recording software documentation, and puts
+#### it into a 2D list AllTrials[[Participant No.]][[Trial No.]]
+###############################
 setwd(WiiReadDir)
 
 folders = list.files(".")
@@ -47,34 +52,37 @@ for (i in folders[1:length(folders)])
 }
 
 ###############################
-### Create edited data sets, put them into appropriate folder new list.
+### Create edited data sets, put them into a new list, and writes them as a CSV
+### to the appropriate folder.
 ###############################
 AllTrialsNew = list()
 
 Pnames = names(AllTrials)
 
+### This loop looks in each trial to find all the duplicate recordings from a
+### previous trial, retains the unique data, and places it into the AllTrialsNew
+### list with the same name but appended with the letter "N" for new.
 for (k in Pnames)
 {
-   TheseNames = names(AllTrials[[k]])
-   TheseNamesNew = TheseNames[2:length(TheseNames)]
-   
-   for (i in 1:length(TheseNames))
-   {
-      TheseNames[i] = paste0(TheseNames[i], "N")
-   }
-   
+   #Check that each subsequent trial has unique data to be retained
    SumCheck = 0
    for (i in 2:length(AllTrials[[k]]))
    {
       a = AllTrials[[k]][[(i-1)]]
       b = AllTrials[[k]][[(i)]]
+      # This should be true when the recording software continually appends the
+      # trial files.
       if (nrow(a)<nrow(b))
       {
+         # This double checks that what we identify as apended data from a 
+         # previous trial truly is duplicated and not unique data to the current
+         # trial being examined.
          SumCheck = SumCheck + sum(a!=b[1:nrow(a),])
       }
-      print(c(i,SumCheck))
+      print(c(i,SumCheck)) # Shows the current trial being examined and the sumcheck.
    }
 
+   # Place checked data into new list with appended name.
    if (SumCheck == 0)
    {
       for (i in 1:(length(AllTrials[[k]])-1))
@@ -88,8 +96,9 @@ for (k in Pnames)
       }
    }
    rm(temp)
-   
 }
+
+# This loop writes the edited data to CSV files from the AllTrialsNew list
 for (k in Pnames)
 {
    setwd(WiiWriteDir)
@@ -113,14 +122,17 @@ for (k in Pnames)
                   row.names = F)
    }
 }
+
 ########################
 ### Put plots in plot directory
 ########################
-k = Pnames[1]
 for (k in Pnames)
 {
    TheseNamesNew = names(AllTrialsNew[[k]])
    
+   # Some trials contained no unique data and so by eliminating the duplicated
+   # data from the previous trial they have been made empty. This loop removes 
+   # them from consideration for plot generation.
    for (i in TheseNamesNew)
    {
       a = AllTrialsNew[[k]][[i]]
@@ -140,7 +152,7 @@ for (k in Pnames)
    
    for (i in TheseNamesNew)
    {
-      NormalGraphicDevice = dev.cur()
+      NormalGraphicDevice = dev.cur() # Retaining default plot settings
       
       ThisTrialName = i
       
@@ -161,6 +173,7 @@ for (k in Pnames)
           width = 800 + maxX/5,
           height = 1000 )
       
+      # Widen margins to make room for y-axis label.
       par(mar = c(5, 6, 4, 2) + 0.1)
       
       plot(thisX,
@@ -199,12 +212,13 @@ for (k in Pnames)
       
       # Close plotting device
       dev.off()
-      
+      # Restore default margins
       par(mar = c(5, 4, 4, 2) + 0.1)
-      
+      # Restore default graphic settings
       dev.set(NormalGraphicDevice)
    
    }
+   # Double check that the file path is closed before looping to new participant.
    dev.off()
 }
 
