@@ -25,7 +25,7 @@ setwd(WiiWriteDir)
 setwd(PlotDir)
 
 ###############################
-#### Read original data
+#### Read original data.
 #### The original data has no header. This loop pulls the data, gives it the
 #### correct header per the Wii recording software documentation, and puts
 #### it into a 2D list AllTrials[[Participant No.]][[Trial No.]]
@@ -123,7 +123,7 @@ for (k in Pnames)
    }
 }
 
-########################
+q########################
 ### Put plots in plot directory
 ########################
 for (k in Pnames)
@@ -227,7 +227,20 @@ for (k in Pnames)
 ### Spot checking
 #######
 
+colnames(AllTrials$`14`$p14t01)
 
+for (i in names(AllTrialsNew[[1]]) )
+{
+   colnames(AllTrialsNew[[1]][[i]]) =  c( "TimeOpen","Frc1","Frc2","Frc3",
+      "Frc4","copX","copY","FrcTot")
+}
+
+for (i in Pnames)
+{
+   print(colnames(AllTrialsNew[[i]][[1]]))
+}
+
+length(AllTrials[[1]])
 
 TempX = AllTrials$`11`$p11t01$copX
 
@@ -242,11 +255,11 @@ for (i in 1:length(AllTrials))
    print(c(a,i))
 }
 
-for (i in 1:length(AllTrials))
+i = Pnames[1]
+
+for (i in Pnames)
 {
    df = AllTrials[[i]][[1]]
-   colnames(df) = c( "TimeOpen","Frc1","Frc2","Frc3",
-                       "Frc4","copX","copY","FrcTot")
    df$TimeDif = c(0,df$TimeOpen[2:nrow(df)]-df$TimeOpen[1:(nrow(df)-1)])
    a = rownames(df[df$TimeDif>40,])%>% as.numeric()
    if (length(a)>0)
@@ -254,13 +267,13 @@ for (i in 1:length(AllTrials))
       ThisName = paste0(names(AllTrials[[i]])[1],"N")
       f = df[c(a[length(a)]:nrow(df)),]
       RowCount = nrow(f)
-      print(c(RowCount,i))
+      print(c(RowCount, i))
       AllTrialsNew[[i]][[ThisName]] = f
    } else 
    {
       ThisName = paste0(names(AllTrials[[i]])[1],"G")
       AllTrialsNew[[i]][[ThisName]] = df
-      print(c(i,nrow(f),"good"))
+      print(c(nrow(f), i, "good"))
    }
 }
 
