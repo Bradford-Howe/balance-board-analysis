@@ -6,25 +6,26 @@ LargeEnvirDir = "//RAGINGWIENIS/personal_folder/Data/Lab/HoverWii data"
 WiiReadDir = "//RAGINGWIENIS/personal_folder/Data/Lab/HoverWii data/Original"
 WiiWriteDir = "//RAGINGWIENIS/personal_folder/Data/Lab/HoverWii data/ExtraCrispy(new)"
 PlotDir = "//RAGINGWIENIS/personal_folder/Data/Lab/HoverWii data/New Plots"
-P2Folder = "//RAGINGWIENIS/personal_folder/Data/Lab/HoverWii data/ExtraCrispy(new)/P2Data"
+P2Folder = "//RAGINGWIENIS/personal_folder/Data/Lab/HoverWii data/ExtraCrispy(new)/P5Data"
 
 
 
 
 setwd(P2Folder)
+CSVFileNames = Sys.glob("*.csv")
 
-files = list.files(
-   path = P2Folder,
-   pattern = "^P2T[0-9]+N\\.csv$",
-   full.names = F
-)
+# CSVFileNames = list.CSVFileNames(
+#    path = P2Folder,
+#    pattern = "^P3T[0-9]+N\\.csv$",
+#    full.names = F
+# )
 
 trial_list = list()
 
-for (i in 1:length(files))
+for (i in 1:length(CSVFileNames))
 {
-   a = read.table(files[i], header = TRUE, sep = ",", row.names = NULL)
-   index = ((which(files == files[i]) %>% as.numeric() )+1) %>% as.character()
+   a = read.table(CSVFileNames[i], header = TRUE, sep = ",", row.names = NULL)
+   index = ((which(CSVFileNames == CSVFileNames[i]) %>% as.numeric() )+1) %>% as.character()
    trial_list[[paste0("P2T",index)]] = a 
 }
 
@@ -51,4 +52,6 @@ rms_df
 plot(rms_df$rms_x, rms_df$rms_y, xlab = "RMS X", ylab = "RMS Y")
 cor(rms_df$rms_x, rms_df$rms_y)
 
-cor.test(rms_df$rms_x, rms_df$rms_y)
+C5 = cor.test(rms_df$rms_x, rms_df$rms_y)
+P5Plot = recordPlot()
+
