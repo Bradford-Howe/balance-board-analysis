@@ -12,6 +12,8 @@ P2Folder = "//RAGINGWIENIS/personal_folder/Data/Lab/HoverWii data/ExtraCrispy(ne
 
 
 setwd(P2Folder)
+
+
 CSVFileNames = Sys.glob("*.csv")
 
 # CSVFileNames = list.CSVFileNames(
